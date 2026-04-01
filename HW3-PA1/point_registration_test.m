@@ -7,7 +7,7 @@ letters = {'a', 'b', 'c', 'd', 'e', 'f', 'g'};
 
 for i = 1:length(letters)
     s = letters{i};
-    fprintf('\n Dataset: pa1-debug-%s \n', s);
+    fprintf('\nDataset: pa1-debug-%s \n', s);
     
     % file names
     calbody_file = sprintf('pa1-debug-%s-calbody.txt', s);
@@ -40,7 +40,7 @@ end
 letters = {'h', 'i', 'j', 'k'};
 for i = 1:length(letters)
     s = letters{i};
-    fprintf('\n Dataset: pa1-debug-%s \n', s);
+    fprintf('\nDataset: pa1-debug-%s \n', s);
     
     % file names
     calbody_file = sprintf('pa1-unknown-%s-calbody.txt', s);
@@ -49,7 +49,7 @@ for i = 1:length(letters)
     % ND and d from calbody
     fid_b = fopen(calbody_file, 'r');
     header_b = fgetl(fid_b);
-    params_b = sscanf(header_b, '%d, %d, %d');
+    params_b = sscanf(header_b, '%d, %d, %d'); % ND,NA,NC
     ND = params_b(1); % Number of markers on the EM base
     d = fscanf(fid_b, '%f, %f, %f', [3, ND]);
     fclose(fid_b);
@@ -57,7 +57,7 @@ for i = 1:length(letters)
     % Frame 1 measured points (D) from calreadings
     fid_r = fopen(calreadings_file, 'r');
     fgetl(fid_r); % Skip header
-    D = fscanf(fid_r, '%f, %f, %f', [3, ND]); % Read first ND points for Frame 1
+    D = fscanf(fid_r, '%f, %f, %f', [3, ND]); % ND,NA,NC,Nframes
     fclose(fid_r);
     
     % Point Registration 
