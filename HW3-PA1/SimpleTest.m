@@ -12,7 +12,7 @@ close all; clear all;
          2 2 4 4;
          0 0 0 0];
 
-    [R, p] = point_registration(A,B)
+    [R, p] = point_registration(A,B);
 
 Bfunc =[];
   for i = 1:size(A,2)
