@@ -71,7 +71,7 @@ else
     fprintf('\nFAILURE: Significant error detected.\n');
 end
 
-%% with noise from gemini
+%% with noise
 % Test script for point_registration.m with Gaussian Noise
 clear; clc;
 
@@ -98,7 +98,7 @@ B_noisy = B_clean + noise;
 % 3. Run Registration
 [R_est, p_est] = point_registration(A, B_noisy);
 
-% 4. Compare Results
+%% 4. Compare Results
 fprintf('--- Results with Noise (sigma = %.2f) ---\n', noise_sigma);
 
 % Rotation Error

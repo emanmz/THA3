@@ -66,3 +66,9 @@ for i = 1:length(letters)
     end
      fclose(fid_r);
 end 
+
+% check 
+
+plot3(C_read(1,:), C_read(2,:), C_read(3,:), 'ro'); hold on;
+plot3(C_expected(1,:), C_expected(2,:), C_expected(3,:), 'bx');
+legend('Read', 'Expected');
