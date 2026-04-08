@@ -36,8 +36,7 @@ for i = 1:length(letters)
 
     for b = 1:numFrames
 
-        % go through the readings file and grab the date for every frame
-        % need to use fscans
+        % go through the readings file and grab the data for every frame
         D_read = fscanf(fid_r, '%f, %f, %f', [3,ND]); % Read ND points
         A_read = fscanf(fid_r, '%f, %f, %f', [3,NA]); % Read NA points
         C_read = fscanf(fid_r, '%f, %f, %f', [3,NC]); % Read NC points
@@ -45,11 +44,15 @@ for i = 1:length(letters)
         % FD
         [Rd, pd] = point_registration(d, D_read);
         FD = [Rd pd; 0 0 0 1];
+       %  %calculate error for FD
+       % D_fit = Rd * d + pd; 
+       % rmse_fd = sqrt(mean(sum((D_read - D_fit).^2, 1)));
 
         % FA
         [Ra, pa] = point_registration(a, A_read);
         FA = [Ra pa; 0 0 0 1];
-
+%     A_fit = Ra * a + pa;
+% rmse_fa = sqrt(mean(sum((A_read - A_fit).^2, 1)));
         % convert c to 4x1
         c_4by4 = [c; ones(1, NC)];
         C_ex_4by4 = (FD \ FA) * c_4by4; %C expected 4x1
@@ -57,14 +60,13 @@ for i = 1:length(letters)
         % C expected 3x1
         C_expected(:,:,b) = C_ex_4by4(1:3,:);
 
-        % 3. Calculate RMSE for THIS frame only
-        % Make sure C_read is also relative to the base if that's what the assignment asks!
-        % If C_read is in Tracker coords, then C_expected should just be FA * c_homog.
-        %this is from gemini btw
+        % % Calculate RMSE for THIS frame only
         distortion_per_marker = sqrt(sum((C_read - C_expected(:,:,b)).^2, 1));
         mean_distortion = mean(distortion_per_marker);
 
-        fprintf('Frame %d Average EM Distortion: %.4f mm\n', b, mean_distortion);    end
+        fprintf('Frame %d Average EM Distortion: %.4f mm\n', b, mean_distortion);   
+        % fprintf('Frame %d Registration Fit Error -> FD: %.6f mm, FA: %.6f mm\n', b, rmse_fd, rmse_fa);
+    end
     fclose(fid_r);
 end
 

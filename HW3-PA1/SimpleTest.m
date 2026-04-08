@@ -25,94 +25,40 @@ Bfunc =[];
   disp('B')
   disp(B)
 
-  %% another test case from gemini
+%% Test Case from Gemini: Point Registration Test Script
+addpath("HW3-PA1");
+% 1. Setup Ground Truth Transformation
+R_true = expm(skewSym(rand(3,1))); % Random valid rotation matrix
+p_true = rand(3, 1) * 10;          % Random translation vector
 
-  % Test script for point_registration.m
-clear; clc;
+% 2. Generate Source Points (3 x N)
+N = 10;
+A = rand(3, N) * 5;
 
-%1. Generate Synthetic Data
-N = 10; % Number of points
-A = rand(3, N); % Random source points (3 x N)
-
-% Define a known rotation (e.g., 45 degrees around Z-axis)
-theta = pi/4;
-R_true = [cos(theta), -sin(theta), 0;
-          sin(theta),  cos(theta), 0;
-          0,           0,           1];
-
-% Define a known translation vector
-p_true = [1.5; -2.0; 3.5];
-
-% Create target points B = R*A + p
-B = R_true * A + p_true;
-
-% 2. Run Registration Function
-[R_est, p_est] = point_registration(A, B);
-
-%3. Verify Results
-fprintf('--- Validation Results ---\n');
-
-% Check Rotation Matrix
-R_error = norm(R_true - R_est, 'fro');
-fprintf('Rotation Matrix Error (Frobenius Norm): %.2e\n', R_error);
-
-% Check Translation Vector
-p_error = norm(p_true - p_est);
-fprintf('Translation Vector Error (L2 Norm): %.2e\n', p_error);
-
-% Check Re-projection Error
-B_est = R_est * A + p_est;
-total_error = sum(sqrt(sum((B - B_est).^2, 1)));
-fprintf('Total Re-projection Error: %.2e\n', total_error);
-
-if total_error < 1e-10
-    fprintf('\nSUCCESS: The registration recovered the transformation correctly.\n');
-else
-    fprintf('\nFAILURE: Significant error detected.\n');
-end
-
-%% with noise from gemini
-% Test script for point_registration.m with Gaussian Noise
-clear; clc;
-
-% 1. Generate Synthetic Data
-N = 50; % Increase points for better noise averaging
-A = rand(3, N); 
-
-% Define known transformation
-theta = pi/3; % 60 degree rotation around Z
-R_true = [cos(theta), -sin(theta), 0;
-          sin(theta),  cos(theta), 0;
-          0,           0,           1];
-p_true = [2.0; -1.0; 0.5];
-
-% Create target points B = R*A + p
+% --- CASE 1: NO NOISE ---
+% Generate target points using ground truth
 B_clean = R_true * A + p_true;
 
-%2. Add Gaussian Noise
-% noise_sigma represents the standard deviation of the noise
-noise_sigma = 0.05; 
-noise = noise_sigma * randn(3, N); 
-B_noisy = B_clean + noise;
+% Run registration
+[R_res1, p_res1] = point_registration(A, B_clean);
 
-% 3. Run Registration
-[R_est, p_est] = point_registration(A, B_noisy);
+% --- CASE 2: WITH NOISE ---
+% Add Gaussian noise to target points
+noise_level = 0.05;
+B_noisy = B_clean + noise_level * randn(3, N);
 
-% 4. Compare Results
-fprintf('--- Results with Noise (sigma = %.2f) ---\n', noise_sigma);
+% Run registration
+[R_res2, p_res2] = point_registration(A, B_noisy);
 
-% Rotation Error
-R_error = norm(R_true - R_est, 'fro');
-fprintf('Rotation Matrix Error (Frobenius): %.4f\n', R_error);
+%% Display Results
+fprintf('--- Ground Truth ---\n');
+disp('R_true:'), disp(R_true);
+disp('p_true:'), disp(p_true);
 
-% Translation Error
-p_error = norm(p_true - p_est);
-fprintf('Translation Vector Error (L2): %.4f\n', p_error);
+fprintf('\n--- Results: NO NOISE ---\n');
+fprintf('Rotation Error (F-norm): %e\n', norm(R_true - R_res1, 'fro'));
+fprintf('Translation Error: %e\n', norm(p_true - p_res1));
 
-% Root Mean Square Error (RMSE) of point alignment
-B_est = R_est * A + p_est;
-rmse = sqrt(mean(sum((B_noisy - B_est).^2, 1)));
-fprintf('Alignment RMSE: %.4f\n', rmse);
-
-% Check how close we are to the noise level
-fprintf('Input Noise Sigma: %.4f\n', noise_sigma);
+fprintf('\n--- Results: WITH NOISE (std = %.2f) ---\n', noise_level);
+fprintf('Rotation Error (F-norm): %e\n', norm(R_true - R_res2, 'fro'));
+fprintf('Translation Error: %e\n', norm(p_true - p_res2));
