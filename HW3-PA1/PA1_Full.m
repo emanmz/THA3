@@ -1,8 +1,11 @@
+%% ======================================================
+% this file is basically everything step by step in case we need to
+% actually fix the distrotion? 
 addpath("HW3-PA1");
 clear; clc;
 
 letters = {'a','b','c','d','e','f','g'}; % debug
-letters = {'h','i','j','k'}; % unknown
+%letters = {'h','i','j','k'}; % unknown
 
 
 for i = 1:length(letters)
@@ -21,7 +24,7 @@ for i = 1:length(letters)
     
 
     %% =====================================================
-    % 1) READ CALBODY
+    % READ CALBODY
 
     calbody_file = sprintf('%s-%s-calbody.txt', prefix, s);
     fid = fopen(calbody_file,'r');
@@ -35,7 +38,7 @@ for i = 1:length(letters)
     fclose(fid);
 
     %% =====================================================
-    % 2) CALREADINGS → C_expected
+    % CALREADINGS → C_expected pt 3
 
     calreadings_file = sprintf('%s-%s-calreadings.txt', prefix, s);
     fid = fopen(calreadings_file,'r');
@@ -64,7 +67,7 @@ for i = 1:length(letters)
     fclose(fid);
 
     %% =====================================================
-    % 3) EM PIVOT
+    % EM PIVOT pt. 4
 
     empivot_file = sprintf('%s-%s-empivot.txt', prefix, s);
     fid = fopen(empivot_file,'r');
@@ -94,7 +97,7 @@ for i = 1:length(letters)
     [~, bPost_em] = pivot_calibration(Rs, ps);
 
     %% =====================================================
-    % 4) OPTICAL PIVOT
+    % OPTICAL PIVOT pt. 5
 
     optpivot_file = sprintf('%s-%s-optpivot.txt', prefix, s);
     fid = fopen(optpivot_file,'r');
@@ -128,7 +131,7 @@ for i = 1:length(letters)
     [~, bPost_opt] = pivot_calibration(Rs, ps);
 
     %% =====================================================
-    % 5) AUX CHECK (DEBUG ONLY)
+    % AUX CHECK (DEBUG ONLY) test ?
     if isDebug
         aux_file = sprintf('%s-%s-auxilliary1.txt', prefix, s);
 
@@ -152,10 +155,13 @@ for i = 1:length(letters)
                 fprintf('OPT error:  %.6f mm\n', norm(bPost_opt - opt_actual));
             end
         end
+    else
+        fprintf('EM ours:   [%8.4f %8.4f %8.4f]\n', bPost_em);
+        fprintf('OPT ours:   [%8.4f %8.4f %8.4f]\n', bPost_opt);
     end
 
 %% =====================================================
-% Saving to an output file :P
+% Saving to an output file :P (pt 3.d?)
     % folder exists
     output_folder = 'Output_Files';
     if ~exist(output_folder, 'dir')
