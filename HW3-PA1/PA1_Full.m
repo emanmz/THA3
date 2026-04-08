@@ -5,7 +5,7 @@ addpath("HW3-PA1");
 clear; clc;
 
 letters = {'a','b','c','d','e','f','g'}; % debug
-%letters = {'h','i','j','k'}; % unknown
+% letters = {'h','i','j','k'}; % unknown
 
 
 for i = 1:length(letters)
@@ -127,7 +127,7 @@ for i = 1:length(letters)
     [~, bPost_opt] = pivot_calibration(Rs, ps);
 
     %% AUX CHECK (DEBUG ONLY) test ?
-    
+
     if isDebug
         aux_file = sprintf('%s-%s-auxilliary1.txt', prefix, s);
 
@@ -160,10 +160,7 @@ for i = 1:length(letters)
 
 % Saving to an output file :P (pt 3.d?)
     % folder exists
-    output_folder = 'Output_Files';
-    if ~exist(output_folder, 'dir')
-        mkdir(output_folder);
-    end
+    output_folder = 'HW3-PA1';
 
     % 2. Setup file paths
     filename = sprintf('%s-%s-output1.txt', prefix, s);
