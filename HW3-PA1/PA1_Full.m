@@ -1,4 +1,4 @@
-%% ======================================================
+%% SET UP
 % this file is basically everything step by step in case we need to
 % actually fix the distrotion? 
 addpath("HW3-PA1");
@@ -23,8 +23,7 @@ for i = 1:length(letters)
     end
     
 
-    %% =====================================================
-    % READ CALBODY
+    %% READ CALBODY
 
     calbody_file = sprintf('%s-%s-calbody.txt', prefix, s);
     fid = fopen(calbody_file,'r');
@@ -37,8 +36,7 @@ for i = 1:length(letters)
     c = fscanf(fid,'%f, %f, %f',[3,NC]);
     fclose(fid);
 
-    %% =====================================================
-    % CALREADINGS → C_expected pt 3
+    %% CALREADINGS → C_expected pt 3
 
     calreadings_file = sprintf('%s-%s-calreadings.txt', prefix, s);
     fid = fopen(calreadings_file,'r');
@@ -66,8 +64,7 @@ for i = 1:length(letters)
     end
     fclose(fid);
 
-    %% =====================================================
-    % EM PIVOT pt. 4
+    %% EM PIVOT pt. 4
 
     empivot_file = sprintf('%s-%s-empivot.txt', prefix, s);
     fid = fopen(empivot_file,'r');
@@ -96,8 +93,7 @@ for i = 1:length(letters)
 
     [~, bPost_em] = pivot_calibration(Rs, ps);
 
-    %% =====================================================
-    % OPTICAL PIVOT pt. 5
+    %% OPTICAL PIVOT pt. 5
 
     optpivot_file = sprintf('%s-%s-optpivot.txt', prefix, s);
     fid = fopen(optpivot_file,'r');
@@ -130,8 +126,8 @@ for i = 1:length(letters)
 
     [~, bPost_opt] = pivot_calibration(Rs, ps);
 
-    %% =====================================================
-    % AUX CHECK (DEBUG ONLY) test ?
+    %% AUX CHECK (DEBUG ONLY) test ?
+    
     if isDebug
         aux_file = sprintf('%s-%s-auxilliary1.txt', prefix, s);
 
@@ -160,7 +156,8 @@ for i = 1:length(letters)
         fprintf('OPT ours:   [%8.4f %8.4f %8.4f]\n', bPost_opt);
     end
 
-%% =====================================================
+%% OUTPUT FILE
+
 % Saving to an output file :P (pt 3.d?)
     % folder exists
     output_folder = 'Output_Files';
@@ -191,8 +188,8 @@ for i = 1:length(letters)
     fprintf('Done processing dataset: %s (Saved to %s)\n', s, output_path);
 end
 
-%% =========================================================
-% HELPER
+%% HELPER
+
 function v = parse_triplet(txt, label)
 expr = [regexptranslate('escape', label), '\s*([-\d\.]+),\s*([-\d\.]+),\s*([-\d\.]+)'];
 tokens = regexp(txt, expr, 'tokens', 'once');
