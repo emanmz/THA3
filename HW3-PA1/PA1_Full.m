@@ -7,11 +7,14 @@ clear; clc;
 letters = {'a','b','c','d','e','f','g'}; % debug
 % letters = {'h','i','j','k'}; % unknown
 
+% are we just going to turn in this file? like should we combine everything
+% here? 
+% talk about other files. I think we need a better way to look at distortion
 
 for i = 1:length(letters)
     s = letters{i};
 
-    fprintf('\n================ %s ================\n', s);
+    fprintf('\n================ %s ================\n', s); % I dont get this stuff. how is it walking through the files?
 
     % Prefix
     if any(strcmp(s, {'a','b','c','d','e','f','g'}))
@@ -25,7 +28,7 @@ for i = 1:length(letters)
 
     %% READ CALBODY
 
-    calbody_file = sprintf('%s-%s-calbody.txt', prefix, s);
+    calbody_file = sprintf('%s-%s-calbody.txt', prefix, s); %like which files is it going through here?
     fid = fopen(calbody_file,'r');
 
     % extract number of markers on each body
@@ -129,7 +132,7 @@ for i = 1:length(letters)
 
     [~, bPost_opt] = pivot_calibration(Rs, ps);
 
-    %% AUX CHECK (DEBUG ONLY) test ?
+    %% AUX CHECK (DEBUG ONLY) test ? 
 
     if isDebug
         aux_file = sprintf('%s-%s-auxilliary1.txt', prefix, s);
@@ -140,18 +143,24 @@ for i = 1:length(letters)
             txt = fileread(aux_file);
 
             em_actual = parse_triplet(txt, 'EM pivot post actual position =');
+            em_est = parse_triplet(txt, 'EM pivot post est    position =');
             opt_actual = parse_triplet(txt, 'Optical pivot post actual position =');
+            opt_est = parse_triplet(txt, 'Optical pivot post est    position =');
 
-            if ~isempty(em_actual)
-                fprintf('EM ours:   [%8.4f %8.4f %8.4f]\n', bPost_em);
-                fprintf('EM actual: [%8.4f %8.4f %8.4f]\n', em_actual);
-                fprintf('EM error:  %.6f mm\n', norm(bPost_em - em_actual));
+            if ~isempty(em_actual) % maybe add an output file check? to check that C_expected is the same
+                fprintf('EM Actual: [%8.4f %8.4f %8.4f]\n', em_actual);
+                fprintf('EM Estimated:   [%8.4f %8.4f %8.4f]\n', em_est);
+                fprintf('EM Calculated:   [%8.4f %8.4f %8.4f]\n', bPost_em);
+                fprintf('EM error (Calc- Act):  %.6f mm\n', norm(bPost_em - em_actual));
+                fprintf('EM error (Calc- Est):  %.6f mm\n', norm(bPost_em - em_est));
             end
 
             if ~isempty(opt_actual)
-                fprintf('OPT ours:   [%8.4f %8.4f %8.4f]\n', bPost_opt);
-                fprintf('OPT actual: [%8.4f %8.4f %8.4f]\n', opt_actual);
-                fprintf('OPT error:  %.6f mm\n', norm(bPost_opt - opt_actual));
+                fprintf('OPT Actual: [%8.4f %8.4f %8.4f]\n', opt_actual);
+                fprintf('OPT Estimated: [%8.4f %8.4f %8.4f]\n', opt_est);
+                fprintf('OPT Calculated:   [%8.4f %8.4f %8.4f]\n', bPost_opt);
+                fprintf('OPT error (Calc- Act):  %.6f mm\n', norm(bPost_opt - opt_actual));
+                fprintf('OPT error (Calc- Est):  %.6f mm\n', norm(bPost_opt - opt_est));
             end
         end
     else
