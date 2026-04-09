@@ -60,8 +60,8 @@ function [R_rel, t_rel] = get_relative_transform(q1, t1, q2, t2)
     R_rel = R1' * R2;
     t_rel = R1' * (t2 - t1)';
     % for B 
-    R_Rel = R * R2';
-    t_rel = t1-R1*R2'*t_2
+    % R_Rel = R * R2';
+    % t_rel = t1=R1*R2'*t
     t_rel = t_rel';
 end
 
