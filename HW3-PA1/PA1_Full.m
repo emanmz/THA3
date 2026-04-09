@@ -1,7 +1,7 @@
 %% SET UP
 % this file is basically everything step by step in case we need to
 % actually fix the distrotion? 
-addpath("HW3-PA1");
+addpath("HW3-PA1_Files");
 clear; clc;
 
 letters = {'a','b','c','d','e','f','g'}; % debug
@@ -132,10 +132,10 @@ for i = 1:length(letters)
 
     [~, bPost_opt] = pivot_calibration(Rs, ps);
 
-    %% AUX CHECK (DEBUG ONLY) test ? 
+    %% output check !! change this f=to compare our output file to the output file given for debug only 
 
     if isDebug
-        aux_file = sprintf('%s-%s-auxilliary1.txt', prefix, s);
+        aux_file = sprintf('%s-%s-output1.txt', prefix, s);
 
         if exist(aux_file, 'file')
             fprintf('\n------ AUX CHECK ------\n');
@@ -172,7 +172,7 @@ for i = 1:length(letters)
 
 % Saving to an output file :P (pt 3.d?)
     % folder exists
-    output_folder = 'HW3-PA1';
+    output_folder = 'Output_Files';
 
     % 2. Setup file paths
     filename = sprintf('%s-%s-output1.txt', prefix, s);
@@ -180,13 +180,13 @@ for i = 1:length(letters)
     
     fid = fopen(output_path, 'w');
 
-    fprintf(fid, '%d, %d, %s\n', NC, numFrames, upper(filename));
-    fprintf(fid, '%.2f, %.2f, %.2f\n', bPost_em(1), bPost_em(2), bPost_em(3));
-    fprintf(fid, '%.2f, %.2f, %.2f\n', bPost_opt(1), bPost_opt(2), bPost_opt(3));
+    fprintf(fid, '%d, %d, %s\n', NC, numFrames, filename);
+    fprintf(fid, '  %.2f,   %.2f,   %.2f\n', bPost_em(1), bPost_em(2), bPost_em(3));
+    fprintf(fid, '  %.2f,   %.2f,   %.2f\n', bPost_opt(1), bPost_opt(2), bPost_opt(3));
     for f = 1:numFrames
         for j = 1:NC
             % Access all 3 coordinates (row, column, page)
-            fprintf(fid, '%.2f, %.2f, %.2f\n', ...
+            fprintf(fid, '  %.2f,   %.2f,   %.2f\n', ...
                 C_expected(1, j, f), ...
                 C_expected(2, j, f), ...
                 C_expected(3, j, f));
