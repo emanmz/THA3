@@ -1,5 +1,44 @@
 addpath("HW3-PA1");
-%% 
+%% Test Case from Gemini: Point Registration Test Script
+
+% 1. Setup Ground Truth Transformation
+R_true = expm(skewSym(rand(3,1))); % Random valid rotation matrix
+p_true = rand(3, 1) * 10;          % Random translation vector
+
+% 2. Generate Source Points (3 x N)
+N = 10;
+A = rand(3, N) * 5;
+
+% --- CASE 1: NO NOISE ---
+% Generate target points using ground truth
+B_clean = R_true * A + p_true;
+
+% Run registration
+[R_res1, p_res1] = point_registration(A, B_clean);
+
+% --- CASE 2: WITH NOISE ---
+% Add Gaussian noise to target points
+noise_level = 0.05;
+B_noisy = B_clean + noise_level * randn(3, N);
+
+% Run registration
+[R_res2, p_res2] = point_registration(A, B_noisy);
+
+% Display Results
+fprintf('--- Ground Truth ---\n');
+disp('R_true:'), disp(R_true);
+disp('p_true:'), disp(p_true);
+
+fprintf('\n--- Results: NO NOISE ---\n');
+fprintf('Rotation Error (F-norm): %e\n', norm(R_true - R_res1, 'fro'));
+fprintf('Translation Error: %e\n', norm(p_true - p_res1));
+
+fprintf('\n--- Results: WITH NOISE (std = %.2f) ---\n', noise_level);
+fprintf('Rotation Error (F-norm): %e\n', norm(R_true - R_res2, 'fro'));
+fprintf('Translation Error: %e\n', norm(p_true - p_res2));
+
+
+%% Test Case with Clean Assignment Data 
 % all dataset letters 
 letters = {'a', 'b', 'c', 'd', 'e', 'f', 'g'};
 % a - c is clean beautiful data 
@@ -35,7 +74,7 @@ for i = 1:length(letters)
     fprintf('Residual Error: %e\n', residual);
     fprintf('Translation Z: %.2f\n', p_D(3));
 end
-%%
+%% Test Case with Noisy Assignment Data
 % for the unkown data 
 letters = {'h', 'i', 'j', 'k'};
 for i = 1:length(letters)

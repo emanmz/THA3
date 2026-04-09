@@ -28,9 +28,12 @@ for i = 1:length(letters)
     calbody_file = sprintf('%s-%s-calbody.txt', prefix, s);
     fid = fopen(calbody_file,'r');
 
-    params = sscanf(fgetl(fid),'%d, %d, %d');
+    % extract number of markers on each body
+    params = sscanf(fgetl(fid),'%d, %d, %d'); 
     ND = params(1); NA = params(2); NC = params(3);
 
+    % extract coordinates of di, ai, and ci representing the markers on
+    % each body
     d = fscanf(fid,'%f, %f, %f',[3,ND]);
     a = fscanf(fid,'%f, %f, %f',[3,NA]);
     c = fscanf(fid,'%f, %f, %f',[3,NC]);
