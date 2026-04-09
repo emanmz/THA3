@@ -4,9 +4,8 @@
 addpath("HW3-PA1");
 clear; clc;
 
-%% comment whichever one you want to test  
-% letters = {'a','b','c','d','e','f','g'}; % debug
-letters = {'h','i','j','k'}; % unknown
+letters = {'a','b','c','d','e','f','g'}; % debug
+% letters = {'h','i','j','k'}; % unknown
 
 % are we just going to turn in this file? like should we combine everything
 % here? 
@@ -143,7 +142,7 @@ for i = 1:length(letters)
 
             txt = fileread(aux_file);
 
-            em_actual = parse_triplet(txt, 'EM pivot post actual position ='); % check later 
+            em_actual = parse_triplet(txt, 'EM pivot post actual position =');
             em_est = parse_triplet(txt, 'EM pivot post est    position =');
             opt_actual = parse_triplet(txt, 'Optical pivot post actual position =');
             opt_est = parse_triplet(txt, 'Optical pivot post est    position =');
@@ -152,10 +151,8 @@ for i = 1:length(letters)
                 fprintf('EM Actual: [%8.4f %8.4f %8.4f]\n', em_actual);
                 fprintf('EM Estimated:   [%8.4f %8.4f %8.4f]\n', em_est);
                 fprintf('EM Calculated:   [%8.4f %8.4f %8.4f]\n', bPost_em);
-                fprintf('EM error (Calc- Act):  %.6f mm\n', norm(bPost_em - em_actual)); % need to fix this !!!!
-                disp(bPost_em - em_actual);
+                fprintf('EM error (Calc- Act):  %.6f mm\n', norm(bPost_em - em_actual)); % need to fix this 
                 fprintf('EM error (Calc- Est):  %.6f mm\n', norm(bPost_em - em_est));
-                disp(bPost_em - em_est);
             end
 
             if ~isempty(opt_actual)
