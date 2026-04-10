@@ -4,18 +4,14 @@
 addpath("HW3-PA1");
 clear; clc;
 
-%% comment whichever one you want to test  
+%% Uncomment the dataset you want to test 
 % letters = {'a','b','c','d','e','f','g'}; % debug
 letters = {'h','i','j','k'}; % unknown
-
-% are we just going to turn in this file? like should we combine everything
-% here? 
-% talk about other files. I think we need a better way to look at distortion
 
 for i = 1:length(letters)
     s = letters{i};
 
-    fprintf('\n================ %s ================\n', s); % I dont get this stuff. how is it walking through the files?
+    fprintf('\n================ %s ================\n', s); 
 
     % Prefix
     if any(strcmp(s, {'a','b','c','d','e','f','g'}))
@@ -29,7 +25,7 @@ for i = 1:length(letters)
 
     %% READ CALBODY
 
-    calbody_file = sprintf('%s-%s-calbody.txt', prefix, s); %like which files is it going through here?
+    calbody_file = sprintf('%s-%s-calbody.txt', prefix, s); 
     fid = fopen(calbody_file,'r');
 
     % extract number of markers on each body
