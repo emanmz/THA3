@@ -51,7 +51,7 @@ function [X_quat, X_t] = solve_hand_eye_quaternion(q_R, t_R, q_C, t_C)
     % Normalize quaternion
     X_quat = X_quat / norm(X_quat);
 
-    % Ensure consistent sign (optional but stabilizes error plots)
+    % Ensure consistent sign 
     if X_quat(1) < 0
         X_quat = -X_quat;
     end
