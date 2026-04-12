@@ -237,9 +237,9 @@ for i = 1:length(letters)
                         max_err = err;
                     end
                 end
-                avg_err = tot_err/numFrames;
+                
             end
-
+            avg_err = tot_err/numFrames;
             fprintf('Max C_expected Error: %.6f mm\n', max_err);
             fprintf('Avg C_expected Error: %.6f mm\n', tot_err / count)
             fclose(fid_our);
