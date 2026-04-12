@@ -1,17 +1,17 @@
 %% SET UP
 % this file is basically everything step by step in case we need to
-% actually fix the distrotion? 
+% actually fix the distrotion?
 addpath("HW3-PA1");
 clear; clc;
 
-%% Uncomment the dataset you want to test 
-% letters = {'a','b','c','d','e','f','g'}; % debug
-letters = {'h','i','j','k'}; % unknown
+%% Uncomment the dataset you want to test
+letters = {'a','b','c','d','e','f','g'}; % debug
+% letters = {'h','i','j','k'}; % unknown
 
 for i = 1:length(letters)
     s = letters{i};
 
-    fprintf('\n================ %s ================\n', s); 
+    fprintf('\n================ %s ================\n', s);
 
     % Prefix
     if any(strcmp(s, {'a','b','c','d','e','f','g'}))
@@ -21,15 +21,15 @@ for i = 1:length(letters)
         prefix = 'pa1-unknown';
         isDebug = false;
     end
-    
+
 
     %% READ CALBODY
 
-    calbody_file = sprintf('%s-%s-calbody.txt', prefix, s); 
+    calbody_file = sprintf('%s-%s-calbody.txt', prefix, s);
     fid = fopen(calbody_file,'r');
 
     % extract number of markers on each body
-    params = sscanf(fgetl(fid),'%d, %d, %d'); 
+    params = sscanf(fgetl(fid),'%d, %d, %d');
     ND = params(1); NA = params(2); NC = params(3);
 
     % extract coordinates of di, ai, and ci representing the markers on
@@ -129,7 +129,7 @@ for i = 1:length(letters)
 
     [~, bPost_opt] = pivot_calibration(Rs, ps);
 
-    %% output check !! change this f=to compare our output file to the output file given for debug only 
+    %% output check !! change this f=to compare our output file to the output file given for debug only
 
     if isDebug
         aux_file = sprintf('%s-%s-auxilliary1.txt', prefix, s);
@@ -139,7 +139,7 @@ for i = 1:length(letters)
 
             txt = fileread(aux_file);
 
-            em_actual = parse_triplet(txt, 'EM pivot post actual position ='); % check later 
+            em_actual = parse_triplet(txt, 'EM pivot post actual position ='); % check later
             em_est = parse_triplet(txt, 'EM pivot post est    position =');
             opt_actual = parse_triplet(txt, 'Optical pivot post actual position =');
             opt_est = parse_triplet(txt, 'Optical pivot post est    position =');
@@ -167,16 +167,16 @@ for i = 1:length(letters)
         fprintf('OPT ours:   [%8.4f %8.4f %8.4f]\n', bPost_opt);
     end
 
-%% OUTPUT FILE
+    %% OUTPUT FILE
 
-% Saving to an output file :P (pt 3.d?)
+    % Saving to an output file :P (pt 3.d?)
     % folder exists
     output_folder = 'Output_Files';
 
     % 2. Setup file paths
     filename = sprintf('%s-%s-output1.txt', prefix, s);
     output_path = fullfile(output_folder, filename);
-    
+
     fid = fopen(output_path, 'w');
 
     fprintf(fid, '%d, %d, %s\n', NC, numFrames, filename);
@@ -194,7 +194,55 @@ for i = 1:length(letters)
 
     fclose(fid);
     fprintf('Done processing dataset: %s (Saved to %s)\n', s, output_path);
+
+    if isDebug
+        our_file = fullfile("Output_Files", sprintf('%s-%s-output1.txt', prefix, s));
+        sol_file = fullfile("HW3-PA1", sprintf('%s-%s-output1.txt', prefix, s));
+        if exist(sol_file, 'file') && exist(our_file, 'file')
+
+            fprintf('------ Comparing OUR vs SOLUTION: %s ------\n', s);
+
+            fid_our = fopen(our_file, 'r');
+            fid_sol = fopen(sol_file, 'r');
+
+            % Skip headers
+            fgetl(fid_our);
+            fgetl(fid_sol);
+
+            % Read pivot tips
+            our_em  = sscanf(fgetl(fid_our), '%f, %f, %f');
+            our_opt = sscanf(fgetl(fid_our), '%f, %f, %f');
+
+            sol_em  = sscanf(fgetl(fid_sol), '%f, %f, %f');
+            sol_opt = sscanf(fgetl(fid_sol), '%f, %f, %f');
+
+            fprintf('EM Tip Error:  %.6f mm\n', norm(our_em - sol_em));
+            fprintf('Opt Tip Error: %.6f mm\n', norm(our_opt - sol_opt));
+
+            % Compare all C_expected points
+            max_err = 0;
+
+            for f = 1:numFrames
+                for j = 1:NC
+                    our_c = sscanf(fgetl(fid_our), '%f, %f, %f');
+                    sol_c = sscanf(fgetl(fid_sol), '%f, %f, %f');
+
+                    err = norm(our_c - sol_c);
+                    if err > max_err
+                        max_err = err;
+                    end
+                end
+            end
+
+            fprintf('Max C_expected Error: %.6f mm\n', max_err);
+            fclose(fid_our);
+            fclose(fid_sol);
+        else
+            fprintf(' files  r missing.\n');
+        end
+    end
 end
+
 
 %% HELPER
 
@@ -206,7 +254,7 @@ if isempty(tokens)
     v = [];
 else
     v = [str2double(tokens{1});
-         str2double(tokens{2});
-         str2double(tokens{3})];
+        str2double(tokens{2});
+        str2double(tokens{3})];
 end
 end
