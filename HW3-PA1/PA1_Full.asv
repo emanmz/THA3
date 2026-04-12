@@ -221,9 +221,6 @@ for i = 1:length(letters)
 
             % Compare all C_expected points
             max_err = 0;
-            tot_err = 0;
-            count = 0;
-
 
             for f = 1:numFrames
                 for j = 1:NC
@@ -231,17 +228,14 @@ for i = 1:length(letters)
                     sol_c = sscanf(fgetl(fid_sol), '%f, %f, %f');
 
                     err = norm(our_c - sol_c);
-                    tot_err = tot_err + err;
-                    count = count + 1;
+                    print
                     if err > max_err
                         max_err = err;
                     end
                 end
-                avg_err = tot_err/numFrames;
             end
 
             fprintf('Max C_expected Error: %.6f mm\n', max_err);
-            fprintf('Avg C_expected Error: %.6f mm\n', tot_err / count)
             fclose(fid_our);
             fclose(fid_sol);
         else
