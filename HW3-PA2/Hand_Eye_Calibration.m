@@ -1,5 +1,6 @@
 %% PA2
 clear; clc;
+addpath("Helper_Functions")
 
 [q_Rc, q_Cc, t_Rc, t_Cc] = data_quaternion();
 [q_Rn, q_Cn, t_Rn, t_Cn] = data_quaternion_noisy(); 
@@ -54,8 +55,9 @@ err_q_n5  = rot_err(qX_c, qX_n5);
 err_q_c5  = rot_err(qX_c, qX_c5);
 
 fprintf('Clean (5 vs 10) Error:     %.4f m, %.4f deg\n', err_t_c5, err_q_c5);
-fprintf('Noisy (10 vs Clean):      %.4f m, %.4f deg\n', err_t_n10, err_q_n10);
+% fprintf('Noisy vs Clean:      %.4f m, %.4f deg\n', err_t_n10, err_q_n10);
 fprintf('Noisy (5 vs Clean):       %.4f m, %.4f deg\n\n', err_t_n5, err_q_n5);
+
 
 %% ================= GEOMETRIC CONSISTENCY (CLEAN) =================
 fprintf('Geometric Consistency Check (Clean Data)\n');
@@ -65,6 +67,31 @@ residuals = zeros(num_poses-1, 1);
 for i = 1:num_poses-1
     qRi = [q_Rc(i,4), q_Rc(i,1:3)]; qRj = [q_Rc(i+1,4), q_Rc(i+1,1:3)];
     qCi = [q_Cc(i,4), q_Cc(i,1:3)]; qCj = [q_Cc(i+1,4), q_Cc(i+1,1:3)];
+
+    RA = quat2rot(qRi)' * quat2rot(qRj);
+    tA = quat2rot(qRi)' * (t_Rc(i+1,:) - t_Rc(i,:))';
+    TA = [RA, tA; 0 0 0 1];
+
+    RB = quat2rot(qCi) * quat2rot(qCj)';
+    tB = t_Cc(i,:)' - RB * t_Cc(i+1,:)';
+    TB = [RB, tB; 0 0 0 1];
+
+    residuals(i) = norm(TA * TX_c - TX_c * TB, 'fro');
+
+    fprintf('Pair %d->%d Residual: %.2e\n', i, i+1, residuals(i));
+end
+fprintf('Average Residual: %.2e\n\n', mean(residuals));
+
+
+
+%% ================= GEOMETRIC CONSISTENCY (Noisy) =================
+fprintf('Geometric Consistency Check (Noisy Data)\n');
+num_poses = size(q_Rn, 1);
+residuals = zeros(num_poses-1, 1);
+
+for i = 1:num_poses-1
+    qRi = [q_Rn(i,4), q_Rn(i,1:3)]; qRj = [q_Rn(i+1,4), q_Rn(i+1,1:3)];
+    qCi = [q_Cn(i,4), q_Cn(i,1:3)]; qCj = [q_Cn(i+1,4), q_Cn(i+1,1:3)];
     
     RA = quat2rot(qRi)' * quat2rot(qRj);
     tA = quat2rot(qRi)' * (t_Rc(i+1,:) - t_Rc(i,:))';
@@ -74,10 +101,11 @@ for i = 1:num_poses-1
     tB = t_Cc(i,:)' - RB * t_Cc(i+1,:)';
     TB = [RB, tB; 0 0 0 1];
     
-    residuals(i) = norm(TA * TX_c - TX_c * TB, 'fro');
+    residuals(i) = norm(TA * TX_n - TX_n * TB, 'fro');
     fprintf('Pair %d->%d Residual: %.2e\n', i, i+1, residuals(i));
 end
 fprintf('Average Residual: %.2e\n\n', mean(residuals));
+
 
 %% ================= CONVERGENCE ANALYSIS (NOISY) =================
 fprintf('Noise Convergence Analysis\n');

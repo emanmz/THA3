@@ -25,7 +25,9 @@ function [R, p] = point_registration(A, B) % W9-L1 Slide 5-6, 12-15
     q = V(:,4);  % extract unit quaternion
 
     R = quat2rot(q(1), q(2), q(3), q(4)); % quaternion to rotation
-    
+
     % Step 4: translation
     p = centroid_B - R * centroid_A;
+
 end
+

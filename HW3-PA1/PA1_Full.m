@@ -1,6 +1,4 @@
 %% SET UP
-% this file is basically everything step by step in case we need to
-% actually fix the distrotion?
 addpath("HW3-PA1");
 clear; clc;
 
@@ -61,7 +59,7 @@ for i = 1:length(letters)
         FA = [Ra, pa; 0 0 0 1];
 
         c_h = [c; ones(1,NC)];
-        C_exp = (FD \ FA) * c_h;
+        C_exp = inv(FD) * FA * c_h;
 
         C_expected(:,:,f) = C_exp(1:3,:);
     end
@@ -148,7 +146,7 @@ for i = 1:length(letters)
                 fprintf('EM Actual: [%8.4f %8.4f %8.4f]\n', em_actual);
                 fprintf('EM Estimated:   [%8.4f %8.4f %8.4f]\n', em_est);
                 fprintf('EM Calculated:   [%8.4f %8.4f %8.4f]\n', bPost_em);
-                fprintf('EM error (Calc- Act):  %.6f mm\n', norm(bPost_em - em_actual)); % need to fix this !!!!
+                fprintf('EM error (Calc- Act):  %.6f mm\n', norm(bPost_em - em_actual)); 
                 disp(bPost_em - em_actual);
                 fprintf('EM error (Calc- Est):  %.6f mm\n', norm(bPost_em - em_est));
                 disp(bPost_em - em_est);

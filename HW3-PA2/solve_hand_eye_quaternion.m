@@ -1,4 +1,4 @@
-function [X_quat, X_t] = solve_hand_eye_quaternion(q_R, t_R, q_C, t_C)
+function [X_quat, X_t] = solve_hand_eye_quaternion(q_R, t_R, q_C, t_C) %W9-L2 Slide 17-22
 
     num_poses = size(q_R, 1);
     n = num_poses - 1;
@@ -29,7 +29,7 @@ function [X_quat, X_t] = solve_hand_eye_quaternion(q_R, t_R, q_C, t_C)
 
         rel_R_B = S_i * S_j';
         rel_t_B(:,i) = t_C(i,:)' - rel_R_B * t_C(i+1,:)';
-        
+                
         % Convert to quaternions
         qA = rot2quat(rel_R_A(:,:,i));
         qB = rot2quat(rel_R_B);
