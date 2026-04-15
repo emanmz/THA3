@@ -39,47 +39,59 @@ for i = 1:length(letters)
 
     %% CALREADINGS → C_expected pt 3
 
+    % Read in Calreadings file
     calreadings_file = sprintf('%s-%s-calreadings.txt', prefix, s);
     fid = fopen(calreadings_file,'r');
 
+    % extract parameters
     params = sscanf(fgetl(fid),'%d, %d, %d, %d');
     numFrames = params(4);
 
+    % preallocate for C_expected
     C_expected = zeros(3, NC, numFrames);
 
     for f = 1:numFrames
+        % number of markers for each body
         D = fscanf(fid,'%f, %f, %f',[3,ND]);
         A = fscanf(fid,'%f, %f, %f',[3,NA]);
         fscanf(fid,'%f, %f, %f',[3,NC]); % C (unused)
 
+        % find transformation Fd
         [Rd, pd] = point_registration(d, D);
         FD = [Rd, pd; 0 0 0 1];
 
+        % find transformation Fa
         [Ra, pa] = point_registration(a, A);
         FA = [Ra, pa; 0 0 0 1];
 
+        % Calculate C_expected with Fd and Fa
         c_h = [c; ones(1,NC)];
         C_exp = inv(FD) * FA * c_h;
 
         C_expected(:,:,f) = C_exp(1:3,:);
+             
     end
     fclose(fid);
 
     %% EM PIVOT pt. 4
 
+    % load file
     empivot_file = sprintf('%s-%s-empivot.txt', prefix, s);
     fid = fopen(empivot_file,'r');
 
+    % extract parameters
     params = sscanf(fgetl(fid),'%d, %d');
     NG = params(1); numFrames_em = params(2);
 
     data = fscanf(fid,'%f, %f, %f',[3, NG*numFrames_em]);
     fclose(fid);
 
+    % calculate local tool frame
     G_local = data(:,1:NG);
     G0 = mean(G_local,2);
     g = G_local - G0;
 
+    % preallocate for transformation
     Rs = zeros(3,3,numFrames_em);
     ps = zeros(3,numFrames_em);
 
@@ -87,18 +99,22 @@ for i = 1:length(letters)
         idx = (k-1)*NG+1 : k*NG;
         G = data(:,idx);
 
+        % calculate transformation between local frame and trackers
         [R,p] = point_registration(g, G);
         Rs(:,:,k) = R;
         ps(:,k) = p;
     end
-
+ 
+    % implement pivot calibration algorithm
     [~, bPost_em] = pivot_calibration(Rs, ps);
 
     %% OPTICAL PIVOT pt. 5
 
+    % load file
     optpivot_file = sprintf('%s-%s-optpivot.txt', prefix, s);
     fid = fopen(optpivot_file,'r');
 
+    % extract parameters
     params = sscanf(fgetl(fid),'%d, %d, %d');
     ND = params(1); NH = params(2);
     numFrames_op = params(3);
@@ -106,9 +122,11 @@ for i = 1:length(letters)
     data = fscanf(fid,'%f, %f, %f',[3, (ND+NH)*numFrames_op]);
     fclose(fid);
 
+    % create local tool frame
     H0 = data(:,ND+1:ND+NH);
     H_local = H0 - mean(H0,2);
 
+    % preallocate 
     Rs = zeros(3,3,numFrames_op);
     ps = zeros(3,numFrames_op);
 
@@ -118,16 +136,20 @@ for i = 1:length(letters)
         D = data(:,idx+1:idx+ND);
         H = data(:,idx+ND+1:idx+ND+NH);
 
+        % transformation for each tool between local frame and trackers
         [Rbase,pbase] = point_registration(d,D);
         [Rprobe,pprobe] = point_registration(H_local,H);
 
+        % change frame to EM 
         Rs(:,:,k) = Rbase' * Rprobe;
         ps(:,k)   = Rbase' * (pprobe - pbase);
     end
 
+    % implement pivot calibration algorithm
     [~, bPost_opt] = pivot_calibration(Rs, ps);
 
-    %% output check !! change this f=to compare our output file to the output file given for debug only
+    %% OUTPUT CHECK
+    % Check calculated tip positions against solution files
 
     if isDebug
         aux_file = sprintf('%s-%s-auxilliary1.txt', prefix, s);
@@ -166,12 +188,12 @@ for i = 1:length(letters)
     end
 
     %% OUTPUT FILE
+    % Saving to an output file
 
-    % Saving to an output file :P (pt 3.d?)
     % folder exists
     output_folder = 'Output_Files';
 
-    % 2. Setup file paths
+    % Setup file paths
     filename = sprintf('%s-%s-output1.txt', prefix, s);
     output_path = fullfile(output_folder, filename);
 
@@ -221,12 +243,19 @@ for i = 1:length(letters)
             max_err = 0;
             tot_err = 0;
             count = 0;
-
+          
+            % Pre-allocate matrices (assuming 3 coordinates: x, y, z)
+            our_all = zeros(3, NC, numFrames);
+            sol_all = zeros(3, NC, numFrames);
 
             for f = 1:numFrames
                 for j = 1:NC
                     our_c = sscanf(fgetl(fid_our), '%f, %f, %f');
                     sol_c = sscanf(fgetl(fid_sol), '%f, %f, %f');
+
+                    % Store the current coordinates into the matrices
+                    our_all(:, j, f) = our_c;
+                    sol_all(:, j, f) = sol_c;
 
                     err = norm(our_c - sol_c);
                     tot_err = tot_err + err;
